@@ -13,7 +13,7 @@ DOWNLOAD_SEMANTIC_SCHOLAR = True
 
 
 def download_semantic_scholar_dataset(download_path: str) -> None:
-    sem_url = "https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2020-04-10/"
+    sem_url = "https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2019-01-31/"
     print("\tDownloading semantic scholar first. ")
     os.mkdir(download_path)
     with urllib.request.urlopen(sem_url + "manifest.txt") as response, open(download_path + "manifest.txt", 'wb') as fh:
@@ -332,7 +332,7 @@ def analyse_extracted_corpus(path_to_file: str, output_path: str) -> None:
 
 
 if __name__ == '__main__':
-    CORPUS_PATH = "../data/"
+    CORPUS_PATH = "../data/data/"
     if DOWNLOAD_SEMANTIC_SCHOLAR:
         print("Downloading semantic scholar. ")
         download_semantic_scholar_dataset(download_path=CORPUS_PATH)
