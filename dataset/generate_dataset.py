@@ -9,7 +9,7 @@ from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
 
-DOWNLOAD_SEMANTIC_SCHOLAR = True
+DOWNLOAD_SEMANTIC_SCHOLAR = False
 
 
 def download_semantic_scholar_dataset(download_path: str) -> None:
@@ -30,11 +30,12 @@ def download_semantic_scholar_dataset(download_path: str) -> None:
                 os.remove(download_path + line)
 
 
-def stream_whole_computer_science_dataset(corpus_path: str, output_path: str, venue_path: str, verbose: int = 1)\
-        -> None:
+def stream_whole_computer_science_dataset(corpus_path: str, output_path: str, file_name: str, venue_path: str,
+                                          verbose: int = 1) -> None:
     """
     :param corpus_path:
     :param output_path:
+    :param file_name:
     :param venue_path:
     :param verbose:
     :return:
@@ -45,8 +46,10 @@ def stream_whole_computer_science_dataset(corpus_path: str, output_path: str, ve
         0, 0, 0, 0, 0
     with open(venue_path, "r") as f:
         venues = f.readlines()
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     venues = venues[0].strip().split(";")
-    with open(output_path, "w", encoding="utf-8") as out_f:
+    with open(output_path + file_name, "w", encoding="utf-8") as out_f:
         for file in tqdm(os.listdir(corpus_path)):
             if "s2-corpus-" in file:
                 with open(corpus_path + file, 'r', encoding='utf-8') as f:
@@ -84,16 +87,19 @@ def stream_whole_computer_science_dataset(corpus_path: str, output_path: str, ve
     print("Finished. ")
 
 
-def stream_medline_dataset(corpus_path: str, output_path: str, verbose: int = 1) -> None:
+def stream_medline_dataset(corpus_path: str, output_path: str, file_name: str, verbose: int = 1) -> None:
     """
     :param corpus_path:
     :param output_path:
+    :param file_name:
     :param verbose:
     :return:
     """
     if verbose:
         print("Extracting all venues from medline. ")
-    with open(output_path, "w", encoding="utf-8") as out_f:
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    with open(output_path + file_name, "w", encoding="utf-8") as out_f:
         for file in tqdm(os.listdir(corpus_path)):
             if "s2-corpus-" in file:
                 with open(corpus_path + file, 'r', encoding='utf-8') as f:
@@ -332,28 +338,29 @@ def analyse_extracted_corpus(path_to_file: str, output_path: str) -> None:
 
 
 if __name__ == '__main__':
-    CORPUS_PATH = "../data/data/"
+    CORPUS_PATH = "./data/"
+    SCHOLAR_PATH = "./data/semantic_scholar/"
     if DOWNLOAD_SEMANTIC_SCHOLAR:
         print("Downloading semantic scholar. ")
-        download_semantic_scholar_dataset(download_path=CORPUS_PATH)
+        download_semantic_scholar_dataset(download_path=SCHOLAR_PATH)
     print("Loading CS dataset. ")
-    stream_whole_computer_science_dataset(corpus_path=CORPUS_PATH, venue_path=CORPUS_PATH + "venues.txt",
-                                          output_path=CORPUS_PATH + "computer_science/computer_science.json")
+    stream_whole_computer_science_dataset(corpus_path=SCHOLAR_PATH, venue_path=os.path.join(CORPUS_PATH, "venues.txt"),
+                                          output_path=os.path.join(CORPUS_PATH, "data/computer_science/"),
+                                          file_name = "computer_science.json")
     print("Split CS dataset. ")
-    create_stratified_train_test_split(path_to_pubs=CORPUS_PATH + "computer_science/computer_science.json")
+    create_stratified_train_test_split(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science.json"))
     print("Loading Medline dataset. ")
-    stream_medline_dataset(corpus_path=CORPUS_PATH, output_path=CORPUS_PATH + "medline/medline.json")
+    stream_medline_dataset(corpus_path=SCHOLAR_PATH, output_path=os.path.join(CORPUS_PATH, "data/medline"),
+                           file_name="medline.json")
     print("Split Medline dataset. ")
-    create_stratified_train_test_split(path_to_pubs=CORPUS_PATH + "medline/medline.json")
+    create_stratified_train_test_split(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline.json"))
     print("##### Computer Science #####")
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "computer_science/computer_science_reduced.json", item_to_analyse="venue"))
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "computer_science/computer_science_reduced.json", item_to_analyse="title"))
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "computer_science/computer_science_reduced.json", item_to_analyse="abstract"))
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "computer_science/computer_science_reduced.json", item_to_analyse="keywords"))
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="venue"))
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="title"))
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="abstract"))
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="keywords"))
     print("##### Medline #####")
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "medline/medline_reduced.json", item_to_analyse="venue"))
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "medline/medline_reduced.json", item_to_analyse="title"))
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "medline/medline_reduced.json", item_to_analyse="keywords"))
-    print(analyse_pubs(path_to_pubs=CORPUS_PATH + "medline/medline_reduced.json", item_to_analyse="abstract"))
-    print("Loading Semantic scholar dataset. ")
-    stream_top_k_semantic_scholar(corpus_path=CORPUS_PATH, output_path=CORPUS_PATH + "semantic_scholar/")
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="venue"))
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="title"))
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="keywords"))
+    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="abstract"))
