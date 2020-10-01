@@ -6,20 +6,20 @@ import os
 import sys
 import pandas as pd
 
-sys.path.append('../')
+sys.path.append(os.getcwd())
 from torch import nn
 from torch import optim
 from tqdm import tqdm
-from model.util.EarlyStopping import EarlyStopping
+from model.model_util.EarlyStopping import EarlyStopping
+from util.utils import mean_reciprocal_rank_at_5
 from util.CoMa_Model import predict_batch
 from util.CoMa_Model import CoMaModel
 from gensim.corpora import Dictionary
-from model.util.IterableConferenceDataset import IterableConferenceDataset
+from model.model_util.IterableConferenceDataset import IterableConferenceDataset
 from torch.utils.data import DataLoader
 from sklearn.metrics import f1_score, label_ranking_average_precision_score, accuracy_score
 from sklearn.preprocessing import label_binarize
 from torchtext.vocab import Vectors
-from util.utils import mean_reciprocal_rank_at_5
 
 
 torch.manual_seed(42)
@@ -35,8 +35,8 @@ class TrainCoMaModel:
         """
         self.args = args
         self.vectors = Vectors(args['corpus_path'] + args['dataset'] + "/word_embeddings.bin").stoi
-        self.output_vectors = self.get_target_dictionary(path_to_dict=args['corpus_path'] + args['dataset'] +
-                                                                      "/venue_dict")
+        self.output_vectors = self.get_target_dictionary(path_to_dict=args['corpus_path'] +
+                                                                      args['dataset'] + "/venue_dict")
         self.val_ds = IterableConferenceDataset(args['corpus_path'] + args['dataset'] + "/" + args['dataset'] +
                                                 "_val.json", args['pad_length_titles'], args['pad_length_abstracts'],
                                                 args['pad_length_keywords'], self.vectors, self.output_vectors.token2id)
@@ -84,39 +84,29 @@ class TrainCoMaModel:
         return self.args
 
     @staticmethod
-    def get_word_vectors(path_to_dict: str, path_to_train: str = None):
+    def get_word_vectors(path_to_dict: str):
         """
         :param path_to_dict:
-        :param path_to_train:
         :return:
         """
         if os.path.exists(path_to_dict):
             return Vectors(args['corpus_path'] + args['dataset'] + "/word_embeddings.bin").stoi
         else:
-            print("Cry")
+            print("Error: Cannot load the word embeddings. ")
             exit(1)
 
     @staticmethod
-    def get_target_dictionary(path_to_dict: str, path_to_train: str = None) -> dict:
+    def get_target_dictionary(path_to_dict: str) -> object:
         """
         :param path_to_dict:
-        :param path_to_train;
         :return:
         """
         if os.path.exists(path=path_to_dict):
             print("Loading venues from file. ")
             return Dictionary.load(path_to_dict)
         else:
-            print("Cry. ")
+            print("Error: Cannot load venue dict. ")
             exit(1)
-            # y_values = set()
-            # with open(path_to_train, "r", encoding="utf-8") as f:
-            #     for line in f:
-            #         line = json.loads(line)
-            #         y_values.update([line['venue'].lower()])
-            # ret_dict = Dictionary([list(y_values)])
-            # ret_dict.save(path_to_dict)
-            # return ret_dict
 
     def train_epochs(self):
         """
@@ -177,8 +167,8 @@ class TrainCoMaModel:
         # Save best model & print loss curves
         if self.args['verbose']:
             print("Saving network to CoMa.model")
-        self.model.load_state_dict(torch.load(args['corpus_path'] + "models/" + '/checkpoint1.pt'))
-        torch.save(self.model.state_dict(), args['corpus_path'] + "models/" + '/CoMa.model')
+        self.model.load_state_dict(torch.load(args['corpus_path'] + "models" + '/checkpoint1.pt'))
+        torch.save(self.model.state_dict(), args['corpus_path'] + "models" + '/CoMa.model')
         if self.args['verbose']:
             print("Training Duration: {:.2f} minutes".format((time.time() - self.start_time) / 60))
 
@@ -187,8 +177,16 @@ class TrainCoMaModel:
         :return:
         """
         # Load model
-        self.model.load_state_dict(torch.load(args['corpus_path'] + "models/" + '/CoMa.model',
-                                              map_location=self.device))
+        model_path = args['corpus_path'] + "models"
+        if self.only_test:
+            if self.args['dataset'] == "computer_science":
+                model_path = os.path.join(model_path, "computer_science")
+            elif self.args['dataset'] == "medline":
+                model_path = os.path.join(model_path, "medline")
+            else:
+                print("Error: Cannot detect dataset", self.args['dataset'])
+                exit(1)
+        self.model.load_state_dict(torch.load(os.path.join(model_path, 'CoMa.model'), map_location=self.device))
         self.model.eval()
         # Setup score calculation
         predictions, probabilities, truths, top_five_accuracies, top_five_idx, top_idx = [], [], [], [], [], []
@@ -235,27 +233,30 @@ class TrainCoMaModel:
 
 if __name__ == '__main__':
     # load config
-    if sys.argv[1]:
-        config_path = sys.argv[1]
-    else:
-        config_path = "../data/config.json"
+    config_path = "./data/config.json"
     with open(config_path, "r", encoding="utf-8") as f:
         config = f.readlines()
     config = [json.loads(line) for line in config]
-    args = config[0]  # 1 for medline dataset
+    if len(sys.argv) > 1:
+        args = config[int(sys.argv[1])]
+    else:
+        args = config[0]  # 1 for medline dataset
     TEST_ONLY = True if 'test_only' in args else False
     if TEST_ONLY:
         print("Testing the model only.")
         args['test_only'] = True
+        print("\n")
+        print("##############################")
+        print("###      Testing CoMa      ###")
+        print("##############################")
     else:
-        print("Training new model. ")
+        print("\n")
+        print("##############################")
+        print("###      Training CoMa     ###")
+        print("##############################")
     print("Args:")
     for k, v in args.items():
         print(k, ": ", v)
-    print("\n")
-    print("##############################")
-    print("###      Training CoMa     ###")
-    print("##############################")
     train_class = TrainCoMaModel(args=args)
     ret_args = train_class.get_result_dict()
     with open(args['corpus_path'] + args['dataset'] + "/results.json", "a+", encoding="utf-8") as f:

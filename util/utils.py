@@ -60,16 +60,13 @@ def print_loss_curves(model_name, train_loss, val_loss):
 
 def mean_reciprocal_rank_at_5(y_prob: numpy.array, class_indices: numpy.array, args: dict) -> float:
     ranks = (numpy.swapaxes(numpy.argsort(-y_prob), 0, 1) == class_indices).argmax(0) + 1
-    with open(args['corpus_path'] + '/Models/' + args['job_id'] + '/ranks.txt', "w", encoding="utf-8") as f:
+    with open(args['corpus_path'] + '/models' + '/ranks.txt', "w", encoding="utf-8") as f:
         for rank in ranks:
             f.write(str(rank) + "\n")
-    print_distribution_curve(ranks, len(y_prob[0]), args)
-
+    # print_distribution_curve(ranks, len(y_prob[0]), args)
     rr = 1/ranks
     rr[ranks > 5] = 0
-
     mrr_at_5 = numpy.mean(rr)
-
     return mrr_at_5
 
 
@@ -83,7 +80,7 @@ def print_distribution_curve(ranks, conf_n, args: dict):
     plt.legend()
     plt.tight_layout()
     plt.show()
-    output_path = args['corpus_path'] + '/Models/' + args['job_id'] + '/distribution_curve.png'
+    output_path = os.path.join(args['corpus_path'], '/models', 'distribution_curve.png')
     fig.savefig(output_path, bbox_inches='tight')
 
 
@@ -221,7 +218,6 @@ def format_word_importances(words, importances):
 
 def get_venue(id: int):
     output_vectors = Dictionary.load(args['corpus_path'] + args['dataset'] + "/venue_dict").token2id
-
     return list(output_vectors)[id]
 
 

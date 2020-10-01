@@ -1,5 +1,6 @@
 import json
 import re
+import os
 from gensim.models import Word2Vec
 from gensim.corpora import Dictionary
 from joblib import cpu_count
@@ -35,7 +36,7 @@ def generate(data_path: str, vector_file: str) -> None:
     :param vector_file:
     :return:
     """
-    print("train")
+    print("Training the word2vec embeddings from", data_path)
     model = Word2Vec(sentences=StreamDataset(data_path), size=VECTOR_SIZE, window=WINDOW,
                      min_count=MINIMUM_TOKEN_OCCURRENCES, workers=NUM_CPUS, iter=ITERATIONS, sample=SAMPLE)
     model.wv.save_word2vec_format(vector_file, binary=False)
@@ -53,6 +54,8 @@ def generate_venue_dict(path_to_data: str, output_path: str) -> None:
 
 
 if __name__ == '__main__':
-    generate("../data/medline/medline_reduced.json", "../data/medline/word_embeddings.bin")
-    generate("../data/computer_science/computer_science_reduced.json", "../data/computer_science/word_embeddings.bin")
-    generate_venue_dict("../data/medline/medline_reduced.json", "../data/medline/venue_dict")
+    PATH = "./data/data/"
+    for ds in ['medline', 'computer_science']:
+        print("Running W2V and target class dictionary creation for", ds, ". ")
+        generate(os.path.join(PATH, ds, ds + "_reduced.json"), os.path.join(PATH, ds, "word_embeddings.bin"))
+        generate_venue_dict(os.path.join(PATH, ds, ds + "_reduced.json"), os.path.join(PATH, ds, "venue_dict"))

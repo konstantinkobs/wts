@@ -4,7 +4,7 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 WORKDIR /workspace/
 
-COPY requirements.txt .
+COPY dataset/dataset_requirements.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install --no-cache -r requirements.txt
 

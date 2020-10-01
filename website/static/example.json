@@ -1,0 +1,59 @@
+{
+	"tokens": {
+		"title": ["token", "token"],
+		"abstract": ["token", "token", "token", "token", "token", "token"],
+		"keywords": ["token", "token", "token"]
+	},
+	"conferences": [
+		{
+			"importances": {
+				"title": [0.7, 0.4],
+				"abstract": [0.8, 0.1, 0.8, 0.7, 0.6, 0.2],
+				"keywords": [0.2, 0.2, 0.2]
+			},
+			"info": "ECML PKDD, the European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases, is one of the leading academic conferences on machine learning and knowledge discovery, held in Europe every year.",
+			"longname": "European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases",
+			"name": "ECML-PKDD"
+		},
+		{
+			"importances": {
+				"title": [0.7, 0.4],
+				"abstract": [0.8, 0.1, 0.8, 0.7, 0.6, 0.2],
+				"keywords": [0.2, 0.2, 0.2]
+			},
+			"info": "ECML PKDD, the European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases, is one of the leading academic conferences on machine learning and knowledge discovery, held in Europe every year.",
+			"longname": "European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases",
+			"name": "ECML-PKDD"
+		},
+		{
+			"importances": {
+				"title": [0.7, 0.4],
+				"abstract": [0.8, 0.1, 0.8, 0.7, 0.6, 0.2],
+				"keywords": [0.2, 0.2, 0.2]
+			},
+			"info": "ECML PKDD, the European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases, is one of the leading academic conferences on machine learning and knowledge discovery, held in Europe every year.",
+			"longname": "European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases",
+			"name": "ECML-PKDD"
+		},
+		{
+			"importances": {
+				"title": [0.7, 0.4],
+				"abstract": [0.8, 0.1, 0.8, 0.7, 0.6, 0.2],
+				"keywords": [0.2, 0.2, 0.2]
+			},
+			"info": "ECML PKDD, the European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases, is one of the leading academic conferences on machine learning and knowledge discovery, held in Europe every year.",
+			"longname": "European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases",
+			"name": "ECML-PKDD"
+		},
+		{
+			"importances": {
+				"title": [0.7, 0.4],
+				"abstract": [0.8, 0.1, 0.8, 0.7, 0.6, 0.2],
+				"keywords": [0.2, 0.2, 0.2]
+			},
+			"info": "ECML PKDD, the European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases, is one of the leading academic conferences on machine learning and knowledge discovery, held in Europe every year.",
+			"longname": "European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases",
+			"name": "ECML-PKDD"
+		}
+	]
+}

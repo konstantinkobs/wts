@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>WTS? Where to submit your paper.</title>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/siimple@3.3.1/dist/siimple.min.css">
+        <link rel="stylesheet" href="./static/style.css">
+
+        <!-- Favicons and other icons for all platforms -->
+        <link rel="apple-touch-icon" sizes="180x180" href="./static/icons/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="./static/icons/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="./static/icons/favicon-16x16.png">
+        <link rel="manifest" href="./static/icons/site.webmanifest">
+        <link rel="mask-icon" href="./static/icons/safari-pinned-tab.svg" color="#546778">
+        <link rel="shortcut icon" href="./static/icons/favicon.ico">
+        <meta name="msapplication-TileColor" content="#546778">
+        <meta name="msapplication-config" content="./static/icons/browserconfig.xml">
+        <meta name="theme-color" content="#546778">
+    </head>
+    <body>
+        <div class="siimple--bg-dark siimple-box--fluid siimple-grid siimple--text-center">
+            <img src="./static/logo.svg" class="siimple--width-100" style="max-width:600px" alt="WTS? Where to submit your paper.">
+        </div>
+
+        <div id="app" class="siimple-content siimple-content--extra-large">
+            <div class="siimple-grid">
+                <div class="siimple-grid-row">
+                    <div class="siimple-grid-col siimple-grid-col--4 siimple-grid-col--sm-12">
+                        <h1 class="siimple-h1">Welcome!</h1>
+                        WTS will recommend <b>Artificial Intelligence</b> conferences and journals based on your title, abstract, and keywords.
+                        After filling in your information (or using an <a v-on:click.prevent="fillExampleInfo()" class="siimple-link">example paper</a>), click the button labeled &ldquo;Where to Submit?&rdquo; to get a list of the <b>top 5</b> out of <a class="siimple-link" v-on:click.prevent="showsModal = true">77 conferences and journals</a>.
+                        You will also get a colorful analysis of your input for each recommendation, indicating which words and phrases were important.<br>
+                        <br>
+                        <b>Disclaimer</b>: We are not responsible if your paper is rejected at the proposed conference. 😉
+                    </div>
+
+                    <div id="form" class="siimple-grid-col siimple-grid-col--8 siimple-grid-col--sm-12">
+                        <form class="siimple-form">
+                            <div class="siimple-field">
+                                <div class="siimple-field-label">Title</div>
+                                <input type="text" class="siimple-input siimple-input--fluid" v-model="titleInput" placeholder="e.g. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding">
+                            </div>
+                            <div class="siimple-field">
+                                <div class="siimple-field-label">Abstract</div>
+                                <textarea class="siimple-textarea siimple-textarea--fluid" rows="9" v-model="abstractInput" placeholder="e.g. We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement)."></textarea>
+                            </div>
+                            <div class="siimple-field">
+                                <div class="siimple-field-label">Keywords</div>
+                                <input type="text" class="siimple-input siimple-input--fluid" v-model="keywordsInput">
+                            </div>
+
+                            <button type="submit" id="submit" class="siimple-btn siimple-btn--primary" v-bind:disabled="!titleInput&&!abstractInput&&!keywordsInput" v-bind:class="{ 'siimple-btn--disabled': !titleInput&&!abstractInput&&!keywordsInput }" v-on:click.prevent="findConferences">Where to Submit?</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="siimple-grid-row" v-if="loading">
+                    <div class="siimple-spinner siimple-spinner--primary"></div>
+                </div>
+
+                <div class="siimple--text-center" v-if="!loading && results">
+                    <h1>Top 5 Conferences and Journals</h1>
+                    <p>
+                        Below you find the top 5 conferences and journals our system found.
+                        In addition to information about the conference or journal, we also show the words and phrases that had positive or negative influence on the decision to recommend you this entry, color coded in green and red, respectively.
+                    </p>
+                </div>
+
+                <div class="siimple-grid-row" v-for="(conference, pos) in results" v-if="!loading">
+                    <div class="siimple-grid-col siimple-grid-col--5 siimple-grid-col--sm-12">
+                        <div class="siimple-card">
+                            <div class="siimple-card-body siimple--text-right">
+                                <div class="siimple-card-title siimple--text-uppercase">{{ pos + 1 }}. {{ conference.name }}</div>
+                                <div class="siimple-card-subtitle" v-if="conference.longname">{{ conference.longname }}</div>
+                                <div class="siimple-rule"></div>
+                                <div class="siimple--text-small siimple--text-justify" v-if="conference.info">
+                                    {{ conference.info }}
+                                    <a class="siimple-link" target="__blank" v-bind:href="conference.info_source">(source)</a>
+                                </div>
+                                <div class="siimple-rule"></div>
+                                <div class="siimple--text-small">
+                                    <a class="siimple-link" target="__blank" v-bind:href="'https://www.google.com/search?q=' + encodeURI(conference.longname) + '#data'">Search on Google</a><br>
+                                    <a class="siimple-link" target="__blank" v-bind:href="'http://www.conferenceranks.com/?searchall=' + encodeURI(conference.name) + '#data'">Search on conferenceranks.com</a><br>
+                                    <a class="siimple-link" target="__blank" v-bind:href="'http://www.wikicfp.com/cfp/servlet/tool.search?year=a&q=' + encodeURI(conference.name) + '#data'">Search on WikiCFP.com</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="siimple-grid-col siimple-grid-col--7 siimple-grid-col--sm-12">
+                        <div class="siimple-card conference">
+                            <div class="siimple-card-body">
+                                <div class="siimple-card-title">
+                                    <span v-html="getHighlights(tokens.title, conference.importances.title).join(' ')"></span>
+                                    <span class="siimple--color-light" v-if="conference.importances.title.length === 0">&lt;no title provided&gt;</span>
+                                </div>
+                                <p class="siimple-p">
+                                    <span v-html="getHighlights(tokens.abstract, conference.importances.abstract).join(' ')"></span>
+                                    <span class="siimple--color-light" v-if="conference.importances.abstract.length === 0">&lt;no abstract provided&gt;</span>
+                                </p>
+                                <p class="siimple-card-subtitle">
+                                    <span v-html="getHighlights(tokens.keywords, conference.importances.keywords).join(' ')"></span>
+                                    <span class="siimple--color-light" v-if="conference.importances.keywords.length === 0">&lt;no keywords provided&gt;</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="siimple-modal siimple-modal--medium" v-if="showsModal">
+                <div class="siimple-modal-content">
+                    <div class="siimple-modal-header">
+                        <div class="siimple-modal-header-title">All Conferences and Journals WTS can recommend</div>
+                        <div class="siimple-modal-header-close" v-on:click="showsModal = false"></div>
+                    </div>
+                    <div class="siimple-modal-body">
+                        <ul>
+                            <li>AAAI (AAAI Conference on Artificial Intelligence)</li>
+                            <li>AAMAS (International Conference on Autonomous Agents and Multiagent Systems)</li>
+                            <li>ACCV (Asian Conference on Computer Vision)</li>
+                            <li>ADT (International Conference on Algorithmic Decision Theory)</li>
+                            <li>AIIDE (The Artificial Intelligence for Interactive Digital Entertainment Conference)</li>
+                            <li>AISTATS (International Conference on Artificial Intelligence and Statistics)</li>
+                            <li>Autonomous Agents and Multi-Agent Systems</li>
+                            <li>Autonomous Robots</li>
+                            <li>CADE (Conference on Automated Deduction)</li>
+                            <li>CHI (Conference on Human Factors in Computing Systems)</li>
+                            <li>CIKM (International Conference on Information and Knowledge Management)</li>
+                            <li>COLING (Conference on Computational Linguistics)</li>
+                            <li>COLT (Conference on Learning Theory)</li>
+                            <li>CoNLL (The SIGNLL Conference on Computational Natural Language Learning)</li>
+                            <li>CoRL (Conference on Robot Learning)</li>
+                            <li>CPAIOR (International Conference on the Integration of Constraint Programming, Artificial Intelligence, and
+                                Operations Research)</li>
+                            <li>CVPR (Conference on Computer Vision and Pattern Recognition)</li>
+                            <li>DMKD (International Conference on Data Mining and Knowledge Discovery)</li>
+                            <li>EACL (European Chapter of the Association for Computational Linguistics)</li>
+                            <li>ECAI (European Conference on Artificial Intelligence)</li>
+                            <li>ECCV (European Conference on Computer Vision)</li>
+                            <li>ECIR (European Conference on Information Retrieval)</li>
+                            <li>ECML (European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases)</li>
+                            <li>EMNLP (Conference on Empirical Methods in Natural Language Processing)</li>
+                            <li>ESWC (Extended Semantic Web Conference)</li>
+                            <li>HCOMP (AAAI Conference on Human Computation and Crowdsourcing)</li>
+                            <li>Humanoids (International Conference on Humanoid Robots)</li>
+                            <li>ICANN (International Conference on Artificial Neural Networks)</li>
+                            <li>ICAPS (International Conference on Automated Planning and Scheduling)</li>
+                            <li>ICCBR (International Conference on Case-Based Reasoning)</li>
+                            <li>ICCV (International Conference on Computer Vision)</li>
+                            <li>ICDM (International Conference on Data Mining)</li>
+                            <li>ICLP (International Conference on Logic Programming)</li>
+                            <li>ICML (International Conference on Machine Learning)</li>
+                            <li>ICRA (International Conference on Robotics and Automation)</li>
+                            <li>IEEE Robotics & Automation Magazine</li>
+                            <li>IEEE Robotics and Automation Letters</li>
+                            <li>IEEE Transactions on Human-Machine Systems</li>
+                            <li>IEEE Transactions on Knowledge and Data Engineering</li>
+                            <li>IEEE Transactions on Neural Networks</li>
+                            <li>IEEE Transactions on Robotics</li>
+                            <li>IJCAI (International Joint Conferences on Artificial Intelligence)</li>
+                            <li>IJCNLP (International Joint Conference on Natural Language Processing)</li>
+                            <li>IJCNN (International Joint Conference on Neural Networks)</li>
+                            <li>ILP (International Conference on Inductive Logic Programming)</li>
+                            <li>Information Retrieval</li>
+                            <li>International Joint Conference on Neural Networks (International Joint Conference on Neural Networks)</li>
+                            <li>International Journal of Computer Vision</li>
+                            <li>INTERSPEECH</li>
+                            <li>IROS (International Conference on Intelligent Robots and Systems)</li>
+                            <li>ISRR (The International Symposium on Robotics Research)</li>
+                            <li>ISWC (International Semantic Web Conference)</li>
+                            <li>IUI (International Conference on Intelligent User Interfaces)</li>
+                            <li>JELIA (European Conference on Logics in Artificial Intelligence)</li>
+                            <li>Journal of Automated Reasoning</li>
+                            <li>KR (Conference on Principles of Knowledge Representation and Reasoning)</li>
+                            <li>LPAR (International Conferences on Logic for Programming, Artificial Intelligence and Reasoning)</li>
+                            <li>NAACL (Conference of the North American Chapter of the Association for Computational Linguistics)</li>
+                            <li>Neural Computation</li>
+                            <li>Neural Processing Letters</li>
+                            <li>NIPS (Conference on Neural Information Processing Systems)</li>
+                            <li>PAKDD (Pacific-Asia Conference on Knowledge Discovery and Data Mining)</li>
+                            <li>PKDD (European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases)</li>
+                            <li>RecSys (ACM Recommender Systems Conference)</li>
+                            <li>Robotics and Autonomous Systems</li>
+                            <li>RSS (Robotics: Science and Systems)</li>
+                            <li>SARA</li>
+                            <li>SAT (International Conference on Theory and Applications of Satisfiability Testing)</li>
+                            <li>SDM (SIAM International Conference on Data Mining)</li>
+                            <li>SIGIR (International ACM SIGIR Conference on Research and Development in Information Retrieval)</li>
+                            <li>SOCS (International Symposium on Combinatorial Search)</li>
+                            <li>TABLEAUX (International Conference on Automated Reasoning with Analytic Tableaux and Related Methods)</li>
+                            <li>TARK (Conference on Theoretical Aspects of Rationality and Knowledge)</li>
+                            <li>UAI (Conference on Uncertainty in Artificial Intelligence)</li>
+                            <li>WINE (Conference on Web and Internet Economics)</li>
+                            <li>WSDM (International Conference on Web Search and Data Mining)</li>
+                            <li>WWW (The Web Conference)</li>
+                        </ul>
+                    </div>
+                    <div class="siimple-modal-footer">
+                        These are the conferences and journals that are considered to be from the field of Artificial Intelligence by <a class="siimple-link" href="https://arxiv.org/pdf/1903.09516.pdf">Kersting et al.</a> and that are present in the <a class="siimple-link" href="http://api.semanticscholar.org/corpus/download/">Semantic Scholar dataset</a>.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="siimple-footer siimple-footer--dark siimple--text-center">
+            <strong>&copy; [Anonymized for Review]</strong> @ [Anonymized for Review]
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+        <script src="./static/script.js"></script>
+    </body>
+</html>

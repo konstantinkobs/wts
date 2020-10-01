@@ -214,7 +214,10 @@ def create_stratified_train_test_split(path_to_pubs: str, output_addon: str = ""
     if removal_method == "percentage":
         pubs = remove_small_y_occurences(path_to_pubs, venues, percentage=5)
     elif removal_method == "top_k":
-        pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=78)
+        if "medline" in path_to_pubs:
+            pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=40)
+        else:
+            pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=78)
     elif removal_method == "cutoff":
         pubs = remove_small_y_occurences(path_to_pubs, venues, hard_cut_off=20000)
     else:
@@ -256,12 +259,12 @@ def create_stratified_train_test_split(path_to_pubs: str, output_addon: str = ""
             f.write("\n")
 
 
-def load_stopwords(path: str = "../data/stopwords.txt") -> list:
-    with open(path, "r", encoding="utf-8") as f:
+def load_stopwords(path: str = "data/") -> list:
+    with open(path + "stopwords.txt", "r", encoding="utf-8") as f:
         return [x.strip() for x in f.readlines()]
 
 
-def analyse_pubs(path_to_pubs: str, item_to_analyse: str = "venue"):
+def analyse_pubs(path_to_pubs: str, corpus_path: str, item_to_analyse: str = "venue"):
     """
     :param path_to_pubs:
     :param item_to_analyse: venue, title, abstract, keywords
@@ -280,7 +283,7 @@ def analyse_pubs(path_to_pubs: str, item_to_analyse: str = "venue"):
         print("Analysing titles. ")
         avg = [len(pub['title'].strip().split(" ")) for pub in pubs]
         print("Average Length of titles: ", (sum(avg)/len(avg)))
-        stopwords = load_stopwords()
+        stopwords = load_stopwords(path=corpus_path)
         data = [[(word, 1) for word in pub['title'].strip().lower().split(" ") if word not in stopwords] for pub in pubs]
         return pd.DataFrame(data=[a for b in data for a in b], columns=["Word", "count"]).groupby("Word").agg("sum"). \
             sort_values(by=['count'], ascending=False)
@@ -288,7 +291,7 @@ def analyse_pubs(path_to_pubs: str, item_to_analyse: str = "venue"):
         print("Analysing abstract. ")
         avg = [len(pub['abstract'].strip().split(" ")) for pub in pubs if "abstract" in pub]
         print("Average Length of abstracts: ", (sum(avg)/len(avg)))
-        stopwords = load_stopwords()
+        stopwords = load_stopwords(path=corpus_path)
         data = [[(word, 1) for word in pub['abstract'].strip().lower().split(" ") if word not in stopwords]
                 for pub in pubs if "abstract" in pub]
         return pd.DataFrame(data=[a for b in data for a in b], columns=["Word", "count"]).groupby("Word").agg("sum"). \
@@ -297,7 +300,7 @@ def analyse_pubs(path_to_pubs: str, item_to_analyse: str = "venue"):
         print("Analysing keywords. ")
         avg = [len(pub['keywords']) for pub in pubs if "keywords" in pub]
         print("Average keywords: ", (sum(avg) / len(avg)))
-        stopwords = load_stopwords()
+        stopwords = load_stopwords(path=corpus_path)
         data = [[(word.lower(), 1) for word in pub['keywords'] if word.lower() not in stopwords]
                 for pub in pubs if "keywords" in pub]
         return pd.DataFrame(data=[a for b in data for a in b], columns=["Word", "count"]).groupby("Word").agg("sum"). \
@@ -343,24 +346,24 @@ if __name__ == '__main__':
     if DOWNLOAD_SEMANTIC_SCHOLAR:
         print("Downloading semantic scholar. ")
         download_semantic_scholar_dataset(download_path=SCHOLAR_PATH)
-    print("Loading CS dataset. ")
-    stream_whole_computer_science_dataset(corpus_path=SCHOLAR_PATH, venue_path=os.path.join(CORPUS_PATH, "venues.txt"),
-                                          output_path=os.path.join(CORPUS_PATH, "data/computer_science/"),
-                                          file_name = "computer_science.json")
-    print("Split CS dataset. ")
-    create_stratified_train_test_split(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science.json"))
+    # print("Loading CS dataset. ")
+    # stream_whole_computer_science_dataset(corpus_path=SCHOLAR_PATH, venue_path=os.path.join(CORPUS_PATH, "venues.txt"),
+    #                                       output_path=os.path.join(CORPUS_PATH, "data/computer_science/"),
+    #                                       file_name = "computer_science.json")
+    # print("Split CS dataset. ")
+    # create_stratified_train_test_split(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science.json"))
     print("Loading Medline dataset. ")
-    stream_medline_dataset(corpus_path=SCHOLAR_PATH, output_path=os.path.join(CORPUS_PATH, "data/medline"),
+    stream_medline_dataset(corpus_path=SCHOLAR_PATH, output_path=os.path.join(CORPUS_PATH, "data/medline/"),
                            file_name="medline.json")
     print("Split Medline dataset. ")
     create_stratified_train_test_split(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline.json"))
-    print("##### Computer Science #####")
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="venue"))
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="title"))
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="abstract"))
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), item_to_analyse="keywords"))
-    print("##### Medline #####")
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="venue"))
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="title"))
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="keywords"))
-    print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), item_to_analyse="abstract"))
+    # print("##### Computer Science #####")
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="venue"))
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="title"))
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="abstract"))
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="keywords"))
+    # print("##### Medline #####")
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="venue"))
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="title"))
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="keywords"))
+    # print(analyse_pubs(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline_reduced.json"), corpus_path=CORPUS_PATH, item_to_analyse="abstract"))

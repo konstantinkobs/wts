@@ -1,0 +1,59 @@
+.input {
+    position: relative;
+
+    border: 2px solid #eef2f7;
+    border-radius: 5px;
+
+    margin: 2rem 0;
+}
+
+.input::before {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+
+    background: white;
+    padding: 0.1rem 0.4rem;
+
+    color: #879aab;
+    font-size: 0.9rem;
+}
+
+.input-display,
+.input-input {
+    min-height: 1rem;
+    padding: 0.5rem;
+
+    outline: none;
+}
+
+.input-display {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+
+    color: transparent;
+}
+
+.input-input {
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.textarea {
+    min-height: 10rem;
+}
+
+
+.highlight {
+    padding: 1px 3px;
+    margin: -1px -3px;
+
+    /* background: hsl(125, 100%, 50%); */
+
+    /* border-radius: 3px; */
+}
