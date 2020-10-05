@@ -4,7 +4,7 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 WORKDIR /workspace/
 
-COPY model/model_requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install --no-cache -r requirements.txt
 RUN python -m spacy download en
@@ -14,3 +14,5 @@ COPY website website
 COPY util util
 COPY data data
 RUN chown -R 1147:1003 .
+
+ENTRYPOINT python3 -u website/app.py

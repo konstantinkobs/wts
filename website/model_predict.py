@@ -4,10 +4,10 @@ import torch
 from torch import nn
 
 from gensim.corpora import Dictionary
-from Code.util.utils import build_json
+from util.utils import build_json
 from torchtext.vocab import Vectors
 from captum.attr import IntegratedGradients, configure_interpretable_embedding_layer, remove_interpretable_embedding_layer
-from Code.models.CoMa_Model import interpret_sentence
+from util.CoMa_Model import interpret_sentence
 
 
 def predict(input_abstract: str, input_title: str, input_keywords: str, model: nn.Module, vectors: Vectors,

@@ -1,13 +1,15 @@
-# Conference Matcher
+# Running the website
 
-1. To start, create a virtual environment in `website`: `python3 -m venv venv`.
-2. Activate it: `source venv/bin/activate`.
-3. Install requirements: `pip3 install -r requirements.txt`.
-4. You need the correct word embeddings and output vectors. They are located on vingilot:
-    - `/scratch/regio/{computer_science/medline}/word_embeddings.bin`
-    - `/scratch/regio/{computer_science/medline}/venue_dict`
-5. Copy them to the corresponding folder: `../data/{computer_science/medline}/` 
-6. Copy the Model weights. 
-    - The Job ID is written in `../website_{medline/computer_science}_config.json`
-    - `scp -r vingilot:/scratch/regio/Models/{Job_ID}/ ./data/Models/`
-6. Then run `./run.sh`
+In order to run the website, the following prerequisites must be met.
+
+- Having docker
+- Created the files `data/data/computer_science/venue_dict` & `data/data/computer_science/word_embeddings.bin` 
+(for further information, see the dataset section)
+- Having a model at `data/models/computer_science/CoMa.model`
+
+In order to run the website, use the following commands: 
+```
+docker build -t wts-website:latest -f website/Dockerfile .
+docker run --publish 5000:5000 wts-website:latest
+```
+ If everything works, the website should be available at `localhost:5000`

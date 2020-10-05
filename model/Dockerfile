@@ -14,3 +14,5 @@ COPY model model
 COPY util util
 COPY data data
 RUN chown -R 1147:1003 .
+
+ENTRYPOINT python3 -u model/WTS_Train.py 0

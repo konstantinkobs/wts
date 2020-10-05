@@ -9,7 +9,7 @@ from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
 
-DOWNLOAD_SEMANTIC_SCHOLAR = False
+DOWNLOAD_SEMANTIC_SCHOLAR = True
 
 
 def download_semantic_scholar_dataset(download_path: str) -> None:

@@ -16,16 +16,20 @@ from gevent.pywsgi import WSGIServer
 app = Flask(__name__)
 
 print("Loading config. ")
-config_file = sys.argv[1]
+if len(sys.argv) > 1:
+    config_file = sys.argv[1]
+else:
+    config_file = "./data/config.json"
 with open(config_file, "r", encoding="utf-8") as f:
     args = json.loads(f.readlines()[0])
-    # args = json.loads(f.read())
 for k, v in args.items():
     print(k, ":", v)
 print("Loading model and vectors. ")
 device = torch.device(args['device'])
 model = CoMaModel(args).to(device)
-model.load_state_dict(torch.load(args['corpus_path'] + "Models/" + args['job_id'] + '/CoMa.model', map_location=device))
+print(os.path.join(args['corpus_path'], "..", "models", args['dataset'], "CoMa.model"))
+model.load_state_dict(torch.load(os.path.join(args['corpus_path'], "..", "models", args['dataset'], 'CoMa.model'),
+                                 map_location=device))
 print("Model: ", device, datetime.datetime.now())
 model.eval()
 vectors = Vectors(args['corpus_path'] + args['dataset'] + "/word_embeddings.bin").stoi

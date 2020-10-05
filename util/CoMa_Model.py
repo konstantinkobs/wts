@@ -15,7 +15,7 @@ class CoMaModel(nn.Module):
         super(CoMaModel, self).__init__()
         # Prepare weights
         print("DEBUG: Loading word embeddings from" + args['corpus_path'] + args['dataset'] + "/word_embeddings.bin")
-        print("DEBUG: Having" + str(args['output_classes']) + "classes. ")
+        print("DEBUG: Having " + str(args['output_classes']) + " classes. ")
         model = gensim.models.KeyedVectors.load_word2vec_format(
             args['corpus_path'] + args['dataset'] + "/word_embeddings.bin")
         weights = torch.FloatTensor(model.vectors)
