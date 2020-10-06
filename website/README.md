@@ -1,15 +1,13 @@
-# Running the website
+# 3. Run the Website (optional)
 
-In order to run the website, the following prerequisites must be met.
+If you want to replicate the website we provide on https://wheretosubmit.ml, please make sure you have the files `data/data/computer_science/venue_dict` and `data/data/computer_science/word_embeddings.bin`, which are created from the [dataset](../dataset/README.md).
+Also you need to have the trained model at `data/models/computer_science/CoMa.model`.
 
-- Having docker
-- Created the files `data/data/computer_science/venue_dict` & `data/data/computer_science/word_embeddings.bin` 
-(for further information, see the dataset section)
-- Having a model at `data/models/computer_science/CoMa.model`
+In order to start the website, run the following commands from the *main directory*:
 
-In order to run the website, use the following commands: 
 ```
 docker build -t wts-website:latest -f website/Dockerfile .
 docker run --publish 5000:5000 wts-website:latest
 ```
- If everything works, the website should be available at `localhost:5000`
+
+If successful, the website is available at `localhost:5000`.
