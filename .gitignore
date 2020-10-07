@@ -3,4 +3,6 @@ data/data/
 .idea/
 kubernetes
 
+!data/data/computer_science/word_embeddings.bin
+!data/data/computer_science/venue_dict
 .dockerignore
