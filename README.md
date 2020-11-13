@@ -1,8 +1,7 @@
 # Where to Submit?
 ## Helping Researchers to Choose the Right Venue
 
-In this repository you find the code for our paper "Where to Submit? Helping Researchers to Choose the Right Venue" 
-that will be published in "Findings of EMNLP 2020".
+In this repository you find the code for our paper ["Where to Submit? Helping Researchers to Choose the Right Venue"](https://www.aclweb.org/anthology/2020.findings-emnlp.78/) published in "Findings of EMNLP 2020".
 
 > Whenever researchers write a paper, the same question occurs: "Where to submit?"
 > In this work, we introduce WTS, an open and interpretable NLP system that recommends conferences and journals to researchers based on the title, abstract, and/or keywords of a given paper.
@@ -24,5 +23,20 @@ To reproduce our results, please go through the following steps:
 If you use the preprocessed data or code, please cite the paper:
 
 ```
-TO BE ANNOUNCED
+@inproceedings{kobs-etal-2020-submit,
+    title = "Where to Submit? Helping Researchers to Choose the Right Venue",
+    author = "Kobs, Konstantin  and
+      Koopmann, Tobias  and
+      Zehe, Albin  and
+      Fernes, David  and
+      Krop, Philipp  and
+      Hotho, Andreas",
+    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2020",
+    month = nov,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.findings-emnlp.78",
+    pages = "878--883"
+}
 ```
