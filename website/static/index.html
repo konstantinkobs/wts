@@ -27,12 +27,21 @@
             <div class="siimple-grid">
                 <div class="siimple-grid-row">
                     <div class="siimple-grid-col siimple-grid-col--4 siimple-grid-col--sm-12">
-                        <h1 class="siimple-h1">Welcome!</h1>
-                        WTS will recommend <b>Artificial Intelligence</b> conferences and journals based on your title, abstract, and keywords.
-                        After filling in your information (or using an <a v-on:click.prevent="fillExampleInfo()" class="siimple-link">example paper</a>), click the button labeled &ldquo;Where to Submit?&rdquo; to get a list of the <b>top 5</b> out of <a class="siimple-link" v-on:click.prevent="showsModal = true">77 conferences and journals</a>.
-                        You will also get a colorful analysis of your input for each recommendation, indicating which words and phrases were important.<br>
-                        <br>
-                        <b>Disclaimer</b>: We are not responsible if your paper is rejected at the proposed conference. 😉
+                        <p>
+                            <b>WTS</b> recommends <b>Artificial Intelligence</b> conferences and journals based on your title, abstract, and keywords.
+                            Just fill in your information (or use an <a v-on:click.prevent="fillExampleInfo()" class="siimple-link">example paper</a>) and click the &ldquo;Where to Submit?&rdquo; button.
+                            You get a list of the <b>five most fitting</b> out of <a class="siimple-link" v-on:click.prevent="showsModal = true">77 conferences and journals</a>.
+                            Additionally, we indicate words and phrases with positive or negative impact on the recommendation using color.
+                            The list can be a starting point for you to choose the most fitting venue.
+                        </p>
+                        <p class="siimple--bg-light siimple--px-2 siimple--py-2 siimple--rounded">
+                            <b>How does it work?</b>
+                            The method is described in our &ldquo;Findings of EMNLP 2020&rdquo; paper <a class="siimple-link" href="https://www.aclweb.org/anthology/2020.findings-emnlp.78/">&ldquo;Where to Submit? Helping Researchers to Choose the Right Venue&rdquo;</a>.
+                            The code and data to run our models locally can be found on <a class="siimple-link" href="https://github.com/konstantinkobs/wts">GitHub</a>.
+                        </p>
+                        <p>
+                            <b>Disclaimer</b>: We are not responsible if your paper gets rejected at the proposed conference. 😉
+                        </p>
                     </div>
 
                     <div id="form" class="siimple-grid-col siimple-grid-col--8 siimple-grid-col--sm-12">
@@ -60,10 +69,11 @@
                 </div>
 
                 <div class="siimple--text-center" v-if="!loading && results">
-                    <h1>Top 5 Conferences and Journals</h1>
+                    <h1>Fitting Conferences and Journals</h1>
                     <p>
-                        Below you find the top 5 conferences and journals our system found.
-                        In addition to information about the conference or journal, we also show the words and phrases that had positive or negative influence on the decision to recommend you this entry, color coded in green and red, respectively.
+                        Below you find the top five fitting conferences and journals our system found for your input.
+                        In addition to metadata about the venue, we also show the words and phrases that had positive or negative influence on the decision to recommend you this entry, color coded in green and red, respectively.
+                        The brighter a color, the higher its impact.
                     </p>
                 </div>
 
@@ -197,7 +207,7 @@
                         </ul>
                     </div>
                     <div class="siimple-modal-footer">
-                        These are the conferences and journals that are considered to be from the field of Artificial Intelligence by <a class="siimple-link" href="https://arxiv.org/pdf/1903.09516.pdf">Kersting et al.</a> and that are present in the <a class="siimple-link" href="http://api.semanticscholar.org/corpus/download/">Semantic Scholar dataset</a>.
+                        These are the conferences and journals that are considered to be from the field of Artificial Intelligence by <a class="siimple-link" href="https://arxiv.org/pdf/1903.09516.pdf">Kersting et al.</a> and that are present in the <a class="siimple-link" href="http://api.semanticscholar.org/corpus/download/">Semantic Scholar dataset (release from 2019-01-31)</a>.
                     </div>
                 </div>
             </div>
@@ -205,7 +215,9 @@
 
 
         <div class="siimple-footer siimple-footer--dark siimple--text-center">
-            <strong>&copy; [Anonymized for Review]</strong> @ [Anonymized for Review]
+            <strong>&copy; <a class="siimple-link" href="http://www.dmir.uni-wuerzburg.de/home/">Chair for Data Science</a></strong> @ <a class="siimple-link" href="https://www.uni-wuerzburg.de/">Julius-Maximilians University Würzburg</a><br>
+            <span class="siimple--color-light">We only process the data you insert in order to give venue recommendations. We neither save your data nor share it with others.</span><br>
+            <a class="siimple-link" href="https://www.uni-wuerzburg.de/sonstiges/impressum/">Legal Notice</a> / <a class="siimple-link" href="https://www.uni-wuerzburg.de/sonstiges/datenschutz/">Privacy Policy</a>
         </div>
         
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
