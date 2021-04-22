@@ -11,6 +11,5 @@ RUN pip install --no-cache -r requirements.txt
 # COPY Code and config
 COPY dataset dataset
 COPY data data
-RUN chown -R 1147:1003 .
 
 ENTRYPOINT dataset/run_dataset.sh
