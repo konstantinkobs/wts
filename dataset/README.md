@@ -6,7 +6,7 @@ Then, to prepare the dataset, run the following commands from the *main director
 
 ```
 docker build -t wts-dataset:latest -f dataset/Dockerfile .
-docker wts-dataset:latest
+docker run wts-dataset:latest
 ```
 
 After a successful run, the following data should be available. `DATASET` represents either `computer_science` or `medline`:
