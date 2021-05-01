@@ -105,7 +105,7 @@ def stream_medline_dataset(corpus_path: str, output_path: str, file_name: str, v
                 with open(corpus_path + file, 'r', encoding='utf-8') as f:
                     for line in f:
                         line = json.loads(line)
-                        if "Medline" in line['sources'] and 'venue' in line:
+                        if "Medline" in line['sources'] and 'venue' in line and 'year' in line:
                             tmp = {"title": line["title"],
                                    "venue": line["venue"],
                                    "authors": line['authors'],
