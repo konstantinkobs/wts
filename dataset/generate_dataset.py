@@ -9,7 +9,7 @@ from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
 
-DOWNLOAD_SEMANTIC_SCHOLAR = True
+DOWNLOAD_SEMANTIC_SCHOLAR = False
 
 
 def download_semantic_scholar_dataset(download_path: str) -> None:
@@ -106,7 +106,10 @@ def stream_medline_dataset(corpus_path: str, output_path: str, file_name: str, v
                     for line in f:
                         line = json.loads(line)
                         if "Medline" in line['sources'] and 'venue' in line:
-                            tmp = {"title": line["title"], "venue": line["venue"]}
+                            tmp = {"title": line["title"],
+                                   "venue": line["venue"],
+                                   "authors": line['authors'],
+                                   "year": line['year']}
                             if line['paperAbstract']:
                                 tmp["abstract"] = line["paperAbstract"]
                             if line["entities"]:
@@ -215,7 +218,7 @@ def create_stratified_train_test_split(path_to_pubs: str, output_addon: str = ""
         pubs = remove_small_y_occurences(path_to_pubs, venues, percentage=5)
     elif removal_method == "top_k":
         if "medline" in path_to_pubs:
-            pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=40)
+            pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=20)
         else:
             pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=78)
     elif removal_method == "cutoff":
@@ -346,15 +349,14 @@ if __name__ == '__main__':
     if DOWNLOAD_SEMANTIC_SCHOLAR:
         print("Downloading semantic scholar. ")
         download_semantic_scholar_dataset(download_path=SCHOLAR_PATH)
-    # print("Loading CS dataset. ")
+    print("Loading CS dataset. ")
     # stream_whole_computer_science_dataset(corpus_path=SCHOLAR_PATH, venue_path=os.path.join(CORPUS_PATH, "venues.txt"),
-    #                                       output_path=os.path.join(CORPUS_PATH, "data/computer_science/"),
-    #                                       file_name = "computer_science.json")
+    # output_path=os.path.join(CORPUS_PATH, "data/computer_science/"),
+    # file_name = "computer_science.json")
     # print("Split CS dataset. ")
     # create_stratified_train_test_split(path_to_pubs=os.path.join(CORPUS_PATH, "data/computer_science/computer_science.json"))
     print("Loading Medline dataset. ")
-    stream_medline_dataset(corpus_path=SCHOLAR_PATH, output_path=os.path.join(CORPUS_PATH, "data/medline/"),
-                           file_name="medline.json")
+    stream_medline_dataset(corpus_path=SCHOLAR_PATH, output_path=os.path.join(CORPUS_PATH, "data/medline/"), file_name="medline.json")
     print("Split Medline dataset. ")
     create_stratified_train_test_split(path_to_pubs=os.path.join(CORPUS_PATH, "data/medline/medline.json"))
     # print("##### Computer Science #####")
