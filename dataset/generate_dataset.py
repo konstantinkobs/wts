@@ -218,7 +218,7 @@ def create_stratified_train_test_split(path_to_pubs: str, output_addon: str = ""
         pubs = remove_small_y_occurences(path_to_pubs, venues, percentage=5)
     elif removal_method == "top_k":
         if "medline" in path_to_pubs:
-            pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=20)
+            pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=1)
         else:
             pubs = remove_small_y_occurences(path_to_pubs, venues, top_k=78)
     elif removal_method == "cutoff":
